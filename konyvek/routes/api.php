@@ -24,15 +24,19 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-Route::apiResource('/users', UserController::class);
 Route::apiResource('/copies', CopyController::class);
 Route::apiResource('/books', BookController::class);
+
+Route::middleware('auth.basic')->group(function () {
+
+    Route::apiResource('/users', UserController::class);
+});
 
 Route::get('/lendings', [LendingController::class, 'index']);
 Route::get('/lendings/{user_id}/{copy_id}/{start}', [LendingController::class, 'show']);
 //Route::put('/lendings/{user_id}/{copy_id}/{start}', [LendingController::class, 'update']);
 Route::post('/lendings', [LendingController::class, 'store']);
-Route::delete('/lendings/{user_id}/{copy_id}/{start}', [LendingController::class, 'destroy']); 
+Route::delete('/lendings/{user_id}/{copy_id}/{start}', [LendingController::class, 'destroy']);
 
 //egyéb végpontok
 Route::patch('/user_update_password/{id}', [UserController::class, 'updatePassword']);
