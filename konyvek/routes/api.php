@@ -30,6 +30,12 @@ Route::apiResource('/books', BookController::class);
 Route::middleware('auth.basic')->group(function () {
 
     Route::apiResource('/users', UserController::class);
+    //Lekérdezések
+    Route::get('lending_by_user', [UserController::class, 'lendingByUser']);
+    Route::get('all_lending_user_copy', [LendingController::class, 'allLendingUserCopy']);
+    Route::get('osszes_kolcsonzes/{keresettDatum}', [LendingController::class, 'osszesKolcsonzes']);
+    Route::get('adott_kolcsonzes_peldany/{keresettID}', [LendingController::class, 'adottKolcsonzesPeldany']);
+    Route::get('harmadik', [LendingController::class, 'harmadik']);
 });
 
 Route::get('/lendings', [LendingController::class, 'index']);

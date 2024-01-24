@@ -24,4 +24,12 @@ class Lending extends Model
         'copy_id',
         'start'
     ];
+
+    public function copies()
+    {
+        return $this->belongsTo(Copy::class, 'copy_id', 'copy_id');
+    }
+
+    public function users()
+    {    return $this->hasMany(User::class, 'id', 'user_id');   }
 }

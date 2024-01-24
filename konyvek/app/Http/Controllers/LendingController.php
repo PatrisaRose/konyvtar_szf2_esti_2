@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Lending;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class LendingController extends Controller
 {
@@ -31,7 +32,7 @@ class LendingController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show ($user_id, $copy_id, $start)
+    public function show($user_id, $copy_id, $start)
     {
         $lending = Lending::where('user_id', $user_id)->where('copy_id', $copy_id)->where('start', $start)->get();
         return $lending[0];
@@ -53,8 +54,42 @@ class LendingController extends Controller
     public function destroy($user_id, $copy_id, $start)
     {
         Lending::where('user_id', $user_id)
-        ->where('copy_id', $copy_id)
-        ->where('start', $start)
-        ->delete();
+            ->where('copy_id', $copy_id)
+            ->where('start', $start)
+            ->delete();
+    }
+
+    public function allLendingUserCopy()
+    {
+        //a modellben megírt függvény
+        //neveit használom
+        $datas = Lending::with(['copies', 'users'])
+        ->get();
+        return $datas;
+    }
+
+    public function osszesKolcsonzes($keresettDatum)
+    {
+        //a modellben megírt függvény
+        //neveit használom
+        $kolcsonzes = Lending::with(['copies', 'users'])->whereDate('start', '=', $keresettDatum)
+        ->get();
+        return $kolcsonzes;
+    }
+
+    public function adottKolcsonzesPeldany($keresettID)
+    {
+        //a modellben megírt függvény
+        //neveit használom
+        $peldany = Lending::with(['copies', 'users'])->where('copy_id', '=', $keresettID)
+        ->get();
+        return $peldany;
+    }
+
+    public function harmadik(){
+        $user = Auth::user();
+        $szamlalo = Lending::with( 'users')->where('user_id', '=', $user->id)
+        ->count();
+        return $szamlalo;
     }
 }
