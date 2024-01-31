@@ -36,6 +36,14 @@ Route::middleware('auth.basic')->group(function () {
     Route::get('osszes_kolcsonzes/{keresettDatum}', [LendingController::class, 'osszesKolcsonzes']);
     Route::get('adott_kolcsonzes_peldany/{keresettID}', [LendingController::class, 'adottKolcsonzesPeldany']);
     Route::get('harmadik', [LendingController::class, 'harmadik']);
+    //DB lekérdezések
+    Route::get('title_count/{title}', [BookController::class, 'titleCount']);
+    //hAuthorTitle
+    Route::get('h_author_title/{hardcovered}', [CopyController::class, 'hAuthorTitle']);
+    Route::middleware(['admin'])->group(function () {
+        //admin útvonalai itt lesznek, pl.
+        Route::apiResource('/users', UserController::class);
+    });
 });
 
 Route::get('/lendings', [LendingController::class, 'index']);

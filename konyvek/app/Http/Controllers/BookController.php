@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Book;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class BookController extends Controller
 {
@@ -35,4 +36,14 @@ class BookController extends Controller
         //find helyett a paraméter
         Book::find($id)->delete();
     }
+
+    public function titleCount($title) {
+      $copies = DB::table('copies as c')	//egy tábla lehet csak
+    //->select('mezo_neve')		//itt nem szükséges
+      ->join('books as b' ,'c.book_id','=','b.book_id') //kapcsolat leírása, akár több join is lehet
+      ->where('b.title','=', $title) 	//esetleges szűrés
+      ->count();				//esetleges aggregálás; ha select, akkor get() a vége
+      return $copies;  
+    }
+    
 }
