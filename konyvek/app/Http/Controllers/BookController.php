@@ -37,13 +37,24 @@ class BookController extends Controller
         Book::find($id)->delete();
     }
 
-    public function titleCount($title) {
-      $copies = DB::table('copies as c')	//egy tábla lehet csak
-    //->select('mezo_neve')		//itt nem szükséges
-      ->join('books as b' ,'c.book_id','=','b.book_id') //kapcsolat leírása, akár több join is lehet
-      ->where('b.title','=', $title) 	//esetleges szűrés
-      ->count();				//esetleges aggregálás; ha select, akkor get() a vége
-      return $copies;  
+    public function titleCount($title){
+        $copies = DB::table('books as b')	//egy tábla lehet csak
+	  //->select('mezo_neve')		//itt nem szükséges
+        ->join('copies as c' ,'b.book_id','=','c.book_id') //kapcsolat leírása, akár több join is lehet
+        ->where('title','=', $title) 	//esetleges szűrés
+        ->count();				//esetleges aggregálás; ha select, akkor get() a vége
+        
+        return $copies;
     }
-    
+
+    public function authorWithMoreBooks(){
+        $books = DB::table('books as b')
+
+        ->selectRaw('b.author, count(*)')->
+        groupBy('b.author')->
+        having('count(*)', '>',  0)->
+        get();
+
+        return $books;
+    }
 }

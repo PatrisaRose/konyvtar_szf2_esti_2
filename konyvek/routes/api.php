@@ -3,6 +3,7 @@
 use App\Http\Controllers\BookController;
 use App\Http\Controllers\CopyController;
 use App\Http\Controllers\LendingController;
+use App\Http\Controllers\ReservationController;
 use App\Http\Controllers\UserController;
 use App\Models\Book;
 use App\Models\Copy;
@@ -24,33 +25,40 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
+Route::middleware('auth.basic')->group(function () {
+    //bejelentkezett felhasználó láthatja
+    Route::middleware( ['admin'])->group(function () {
+        //admin útvonalai itt lesznek, pl.
+            Route::apiResource('/users', UserController::class);
+    });
+    //Lekérdezések with
+    Route::get('lending_by_user', [UserController::class, 'lendingByUser']);
+    Route::get('all_lending_user_copy', [LendingController::class, 'allLendingUserCopy']);
+    Route::get('lendings_count_user', [LendingController::class, 'lendingsCountByUser']);
+    //DB lekérdezések
+    Route::get('title_count/{title}', [BookController::class, 'titleCount']);
+    Route::get('h_author_title/{hardcovered}', [CopyController::class, 'hAuthorTitle']);
+    Route::get('ev/{year}', [CopyController::class, 'ev']);
+});
+
+//guest is láthatja
 Route::apiResource('/copies', CopyController::class);
 Route::apiResource('/books', BookController::class);
 
-Route::middleware('auth.basic')->group(function () {
-
-    Route::apiResource('/users', UserController::class);
-    //Lekérdezések
-    Route::get('lending_by_user', [UserController::class, 'lendingByUser']);
-    Route::get('all_lending_user_copy', [LendingController::class, 'allLendingUserCopy']);
-    Route::get('osszes_kolcsonzes/{keresettDatum}', [LendingController::class, 'osszesKolcsonzes']);
-    Route::get('adott_kolcsonzes_peldany/{keresettID}', [LendingController::class, 'adottKolcsonzesPeldany']);
-    Route::get('harmadik', [LendingController::class, 'harmadik']);
-    //DB lekérdezések
-    Route::get('title_count/{title}', [BookController::class, 'titleCount']);
-    //hAuthorTitle
-    Route::get('h_author_title/{hardcovered}', [CopyController::class, 'hAuthorTitle']);
-    Route::middleware(['admin'])->group(function () {
-        //admin útvonalai itt lesznek, pl.
-        Route::apiResource('/users', UserController::class);
-    });
-});
-
-Route::get('/lendings', [LendingController::class, 'index']);
-Route::get('/lendings/{user_id}/{copy_id}/{start}', [LendingController::class, 'show']);
+Route::get('lendings', [LendingController::class, 'index']);
+Route::get('lendings/{user_id}/{copy_id}/{start}', [LendingController::class, 'show']);
 //Route::put('/lendings/{user_id}/{copy_id}/{start}', [LendingController::class, 'update']);
-Route::post('/lendings', [LendingController::class, 'store']);
-Route::delete('/lendings/{user_id}/{copy_id}/{start}', [LendingController::class, 'destroy']);
+Route::post('lendings', [LendingController::class, 'store']);
+Route::delete('lendings/{user_id}/{copy_id}/{start}', [LendingController::class, 'destroy']); 
+
+Route::get('reservations', [ReservationController::class, 'index']);
+Route::get('reservations/{book_id}/{user_id}/{start}', [ReservationController::class, 'show']);
+Route::put('reservations/{book_id}/{user_id}/{start}', [ReservationController::class, 'update']);
+Route::post('reservations', [ReservationController::class, 'store']);
+Route::delete('reservations/{book_id}/{user_id}/{start}', [ReservationController::class, 'destroy']); 
+
+
+Route::get('author_with_more_books', [BookController::class, 'authorWithMoreBooks']); 
 
 //egyéb végpontok
-Route::patch('/user_update_password/{id}', [UserController::class, 'updatePassword']);
+Route::patch('user_update_password/{id}', [UserController::class, 'updatePassword']);
